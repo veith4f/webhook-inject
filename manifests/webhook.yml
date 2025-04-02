@@ -1,0 +1,93 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: webhook-inject
+webhooks:
+  - name: webhook-inject.kube-system.svc.cluster.local
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    clientConfig:
+      service:
+        name: webhook-inject
+        namespace: <WEBHOOK_NAMESPACE>
+        path: "/pod/inject"
+      caBundle: <CA_BUNDLE>
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        operations: ["CREATE", "UPDATE"]
+        scope: "Namespaced"
+    namespaceSelector:
+      matchLabels:
+        netfira.com/namespace.type: "customer"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-secrets
+  namespace: <WEBHOOK_NAMESPACE>
+data:
+  custom: QVdTX0FDQ0VTU19LRVlfSUQ9ImZvbyIKQVdTX1NFQ1JFVF9BQ0NFU1NfS0VZPSJiYXIiCg==
+  mynamespace: QVdTX0FDQ0VTU19LRVlfSUQ9ImZvbyIKQVdTX1NFQ1JFVF9BQ0NFU1NfS0VZPSJiYXIiCg==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webhook-inject
+  namespace: <WEBHOOK_NAMESPACE>
+type: kubernetes.io/tls
+data:
+  tls.crt: <TLS_CERT>
+  tls.key: <TLS_KEY>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-inject
+  namespace: <WEBHOOK_NAMESPACE>
+  labels:
+    app: webhook-inject
+spec:  
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-inject
+  template:
+    metadata:
+      labels:
+        app: webhook-inject
+    spec:
+      containers:
+        - name: webhook-inject
+          image: <IMAGE>
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 443
+          volumeMounts:
+            - name: cert
+              mountPath: "/tls"
+              readOnly: true
+            - name: aws-secrets
+              mountPath: "/secrets"
+              readOnly: true
+      volumes:
+        - name: cert
+          secret:
+            secretName: webhook-inject
+        - name: aws-secrets
+          secret:
+            secretName: aws-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-inject
+  namespace: <WEBHOOK_NAMESPACE>
+spec:
+  ports:
+    - port: 443
+      targetPort: 443
+  selector:
+    app: webhook-inject
+
