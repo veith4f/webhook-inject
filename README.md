@@ -67,7 +67,7 @@ Webserver logic is implemented in `webhook.py` and is roughly:
 
 
 ## Usage
-- place ca.crt and ca.key in certs directory
+- place ca.crt and ca.key in `cert` directory
 - `make cert`
 - set `REGISTRY` in `Makefile` to a docker registry you have access to
 - `make build`
