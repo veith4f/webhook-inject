@@ -62,5 +62,5 @@ if __name__ == "__main__":
 	context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 	context.load_cert_chain("/tls/tls.crt", "/tls/tls.key")
 	
-	log.info("Starting CoreDNS Webhook on port 443...")
+	log.info("Starting Webhook on port 443...")
 	app.run(host="0.0.0.0", port=443, ssl_context=context)

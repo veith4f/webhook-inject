@@ -63,11 +63,11 @@ webhooks:
 The specific idea is to call the webserver for create and update operations on pods in namespaces which are labelled `netfira.com/namespace.type: "customer"`.
 
 Webserver logic is implemented in `webhook.py` and is roughly:
-`on pod create/update -> get env for namespace -> inject vars into pod`
+- `on pod create/update -> get env for namespace -> inject vars into pod`
 
 
 ## Usage
-- place ca.crt and ca.key in `cert` directory
+- place `ca.crt` and `ca.key` in `cert` directory
 - `make cert`
 - set `REGISTRY` in `Makefile` to a docker registry you have access to
 - `make build`
