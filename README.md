@@ -12,7 +12,7 @@ The idea of MutatingWebHooks is to listen to events (such as create, update) tha
 
 For security purposes, a MutatingWebHook must provide a certificate that is signed by the cluster's certificate authority. This is necessary, because modifying resources can be dangerous - especially when those resources don't belong to the person modifying them. By requiring a signature created with the cluster ca's private key which is usually owned by the cluster admin, abuse risks of DynamicAdmissionControl are mitigated. 
 
-In order to obtain your cluster ca certificate and private key, ask your friendly cluster admin or provider (such as plusserver).
+In order to obtain your cluster ca certificate and private key, ask your friendly cluster admin or provider.
 
 ## Particular construction in this repository explained
 The idea is to create a `Secret` (i.e. manifests/webhook.yml|aws-secrets) that contains an env file per each namespace where pods start that should have specific environment variables (such as AWS_ACCESS_KEY_ID) and mount that secret into the container executing the webservice.
